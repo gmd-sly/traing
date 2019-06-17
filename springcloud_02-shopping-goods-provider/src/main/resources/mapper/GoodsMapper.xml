@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.springcloud.dao.GoodsMapper">
+	<resultMap id="BaseResultMap"
+		type="com.springcloud.entity.Goods">
+		<id column="goods_id" jdbcType="INTEGER" property="goodsId" />
+		<result column="goods_name" jdbcType="VARCHAR"
+			property="goodsName" />
+		<result column="goods_price" jdbcType="DOUBLE"
+			property="goodsPrice" />
+		<result column="goods_discount" jdbcType="DOUBLE"
+			property="goodsDiscount" />
+		<result column="goods_status" jdbcType="INTEGER"
+			property="goodsStatus" />
+		<result column="goods_num" jdbcType="INTEGER"
+			property="goodsNum" />
+		<result column="goods_new" jdbcType="INTEGER"
+			property="goodsNew" />
+		<result column="goods_hot" jdbcType="INTEGER"
+			property="goodsHot" />
+		<result column="goods_level" jdbcType="INTEGER"
+			property="goodsLevel" />
+		<result column="goods_desc" jdbcType="VARCHAR"
+			property="goodsDesc" />
+		<result column="goods_detail" jdbcType="VARCHAR"
+			property="goodsDetail" />
+		<result column="goods_img" jdbcType="VARCHAR"
+			property="goodsImg" />
+		<result column="type_two_id" jdbcType="INTEGER"
+			property="typeTwoId" />
+		<result column="type_one_id" property="typeOneId" />
+	</resultMap>
+	<delete id="deleteByPrimaryKey"
+		parameterType="java.lang.Integer">
+		delete from goods
+		where goods_id =
+		#{goodsId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.springcloud.entity.Goods">
+		insert into goods (
+		goods_name, goods_price,
+		goods_discount, goods_status, goods_num,
+		goods_new, goods_hot, goods_level,
+		goods_desc, goods_detail, goods_img,
+		type_two_id)
+		values (#{goodsName,jdbcType=VARCHAR},
+		#{goodsPrice,jdbcType=DOUBLE},
+		#{goodsDiscount,jdbcType=DOUBLE},
+		#{goodsStatus,jdbcType=INTEGER},
+		#{goodsNum,jdbcType=INTEGER},
+		#{goodsNew,jdbcType=INTEGER}, #{goodsHot,jdbcType=INTEGER},
+		#{goodsLevel,jdbcType=INTEGER},
+		#{goodsDesc,jdbcType=VARCHAR},
+		#{goodsDetail,jdbcType=VARCHAR},
+		#{goodsImg,jdbcType=VARCHAR},
+		#{typeTwoId,jdbcType=INTEGER})
+	</insert>
+	<update id="updateByPrimaryKey"
+		parameterType="com.springcloud.entity.Goods">
+		update goods
+		set goods_name =
+		#{goodsName,jdbcType=VARCHAR},
+		goods_price =
+		#{goodsPrice,jdbcType=DOUBLE},
+		goods_discount =
+		#{goodsDiscount,jdbcType=DOUBLE},
+		goods_num =
+		#{goodsNum,jdbcType=INTEGER},
+		goods_level =
+		#{goodsLevel,jdbcType=INTEGER},
+		goods_desc =
+		#{goodsDesc,jdbcType=VARCHAR},
+		goods_detail =
+		#{goodsDetail,jdbcType=VARCHAR},
+		type_two_id =
+		#{typeTwoId,jdbcType=INTEGER}
+		where goods_id =
+		#{goodsId,jdbcType=INTEGER}
+	</update>
+	<select id="selectByPrimaryKey"
+		parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select goods_id,
+		goods_name, goods_price, goods_discount, goods_status,
+		goods_num,
+		goods_new, goods_hot, goods_level, goods_desc, goods_detail,
+		goods_img,
+		type_two_id
+		from goods
+		where goods_id =
+		#{goodsId,jdbcType=INTEGER}
+	</select>
+	<select id="selectAll" resultMap="BaseResultMap">
+		select goods_id, goods_name,
+		goods_price, goods_discount, goods_status,
+		goods_num,
+		goods_new,
+		goods_hot, goods_level, goods_desc, goods_detail, goods_img,
+		type_two_id
+		from goods
+	</select>
+	<!-- 查询GOODS表中满足条件的商品信息 -->
+	<select id="select" parameterType="com.springcloud.entity.Goods"
+		resultMap="BaseResultMap">
+		select g.goods_id, g.goods_name, g.goods_price, g.goods_discount,
+		g.goods_status, g.goods_num,
+		g.goods_new, g.goods_hot, g.goods_level,
+		g.goods_desc, g.goods_detail,
+		g.goods_img,
+		t2.type_two_id,t1.type_one_id
+		from type_one
+		t1 join type_two t2 on
+		t1.type_one_id=t2.type_one_id
+		join goods g on
+		g.type_two_id=t2.type_two_id
+		<!-- 当第一个条件前面为and或or时，使用where替换条件中的and或or -->
+		<trim prefix="where" prefixOverrides="and|or">
+			<if test="goodsName!='%%' and goodsName!='%null%'">
+				g.goods_Name like #{goodsName}
+			</if>
+			<if test="goodsPriceMin!=null and goodsPriceMax!=null">
+				and g.goods_Price between #{goodsPriceMin} and
+				#{goodsPriceMax}
+			</if>
+			<if test="typeOneId!=-1">
+				and t1.type_one_id=#{typeOneId}
+			</if>
+			<if test="typeTwoId!=-1">
+				and t2.type_two_id=#{typeTwoId}
+			</if>
+		</trim>
+	</select>
+
+	<!-- 根据条件修改DOODS表中指定GOODS_ID的商品信息 -->
+	<update id="updateGoodsById"
+		parameterType="com.springcloud.entity.Goods">
+		update goods set
+		<if test="goodsHot!=null">
+			goods_hot=#{goodsHot}
+		</if>
+		<if test="goodsNew!=null">
+			goods_new=#{goodsNew}
+		</if>
+		<if test="goodsStatus!=null">
+			goods_Status=#{goodsStatus}
+		</if>
+		<if test="goodsImg!=null and goodsImg!=''">
+			goods_img=#{goodsImg}
+		</if>
+		where goods_id=#{goodsId}
+	</update>
+
+	<!-- 查询销量前10的商品信息 -->
+	<select id="selectGroup" resultMap="goodsGroupMap">
+		select g.goods_name,sum(o.goods_final_num) as goods_sum
+		from goods g join order_details o on g.goods_id=o.goods_id
+		group by g.goods_name
+		order by 2 desc
+		limit 0,10;
+	</select>
+	
+	<resultMap type="com.springcloud.entity.Goods" id="goodsGroupMap">
+	    <result column="goods_name" property="goodsName" />
+	    <result column="goods_sum" property="goodsSum" />
+	</resultMap>
+
+</mapper>

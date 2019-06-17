@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.springcloud.dao.TypeTwoMapper">
+  <resultMap id="BaseResultMap" type="com.springcloud.entity.TypeTwo">
+    <id column="type_two_id" jdbcType="INTEGER" property="typeTwoId" />
+    <result column="type_two_name" jdbcType="VARCHAR" property="typeTwoName" />
+    <result column="type_one_id" jdbcType="INTEGER" property="typeOneId" />
+    <result column="type_two_remark" jdbcType="VARCHAR" property="typeTwoRemark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from type_two
+    where type_two_id = #{typeTwoId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.springcloud.entity.TypeTwo">
+    insert into type_two (type_two_id, type_two_name, type_one_id, 
+      type_two_remark)
+    values (#{typeTwoId,jdbcType=INTEGER}, #{typeTwoName,jdbcType=VARCHAR}, #{typeOneId,jdbcType=INTEGER}, 
+      #{typeTwoRemark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.springcloud.entity.TypeTwo">
+    update type_two
+    set type_two_name = #{typeTwoName,jdbcType=VARCHAR},
+      type_one_id = #{typeOneId,jdbcType=INTEGER},
+      type_two_remark = #{typeTwoRemark,jdbcType=VARCHAR}
+    where type_two_id = #{typeTwoId,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select type_two_id, type_two_name, type_one_id, type_two_remark
+    from type_two
+    where type_two_id = #{typeTwoId,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select type_two_id, type_two_name, type_one_id, type_two_remark
+    from type_two
+  </select>
+  <!-- 查询TYPE_TWO表中指定TYPE_ONE_ID的二级类别信息 -->
+  <select id="selectByTypeOneId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+      select type_two_id, type_two_name, type_one_id, type_two_remark
+    from type_two
+    where type_one_id=#{typeOneId}
+  </select>
+</mapper>
